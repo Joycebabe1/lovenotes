@@ -231,135 +231,136 @@
             </div>
         </div>
     </div>
+<script>
+// 等整个页面全部DOM、外部JS加载完成后，再执行代码
+window.addEventListener('load', async function(){
+    const SUPABASE_URL = "https://jhwvrkybppblaxipzatzt.supabase.co";
+    const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impod3Zya3licGJsYXhpcHphdHp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4OTA4MzEsImV4cCI6MjEwNzQ2NjgzMX0.q0uYDzEFDKnm30LsG2fdnSF_npcMkpYaPGGUZm-GHS4";
 
-    <script>
-        // =========替换这里==========
-        const SUPABASE_URL = "https://jhwvrkybppblaxipzatzt.supabase.co";
-const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impod3Zya3licGJsYXhpcHphdHp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4OTA4MzEsImV4cCI6MjEwNzQ2NjgzMX0.q0uYDzEFDKnm30LsG2fdnSF_npcMkpYaPGGUZm-GHS4";
-        // ===========================
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const loginPanel = document.getElementById('loginPanel');
-        const selectPanel = document.getElementById('selectPanel');
-        const inputPanel = document.getElementById('inputPanel');
-        const titleText = document.getElementById('titleText');
-        const contentInput = document.getElementById('contentInput');
-        const backBtn = document.getElementById('backBtn');
-        const sendBtn = document.getElementById('sendBtn');
-        const recordToggleBtn = document.getElementById('recordToggleBtn');
-        const recordBox = document.getElementById('recordBox');
-        const recordList = document.getElementById('recordList');
-        const usernameInput = document.getElementById('usernameInput');
-        const loginBtn = document.getElementById('loginBtn');
+    const loginPanel = document.getElementById('loginPanel');
+    const selectPanel = document.getElementById('selectPanel');
+    const inputPanel = document.getElementById('inputPanel');
+    const titleText = document.getElementById('titleText');
+    const contentInput = document.getElementById('contentInput');
+    const backBtn = document.getElementById('backBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const recordToggleBtn = document.getElementById('recordToggleBtn');
+    const recordBox = document.getElementById('recordBox');
+    const recordList = document.getElementById('recordList');
+    const usernameInput = document.getElementById('usernameInput');
+    const loginBtn = document.getElementById('loginBtn');
 
-        let currentUser = "";
-        let currentType = "";
+    let currentUser = "";
+    let currentType = "";
 
-        const typeConfig = {
-            trash: {
-                name: "🗑️ 垃圾桶",
-                btnText: "🚮通通丢掉!"
-            },
-            whisper: {
-                name: "🤫 悄悄话",
-                btnText: "🌳烦恼悄悄放在树洞"
-            },
-            moment: {
-                name: "🥰 sweet moments",
-                btnText: "💌Share with Joyce"
-            },
-            murmur: {
-                name: "💭 碎碎念",
-                btnText: "✍️胡思乱想的小记"
-            }
-        };
-
-        // 登录
-        loginBtn.onclick = async function(){
-            const name = usernameInput.value.trim();
-            if(!name){
-                alert("请输入名字");
-                return;
-            }
-            currentUser = name;
-            loginPanel.style.display="none";
-            selectPanel.style.display="grid";
+    const typeConfig = {
+        trash: {
+            name: "🗑️ 垃圾桶",
+            btnText: "🚮通通丢掉!"
+        },
+        whisper: {
+            name: "🤫 悄悄话",
+            btnText: "🌳烦恼悄悄放在树洞"
+        },
+        moment: {
+            name: "🥰 sweet moments",
+            btnText: "💌Share with Joyce"
+        },
+        murmur: {
+            name: "💭 碎碎念",
+            btnText: "✍️胡思乱想的小记"
         }
+    };
 
-        // 渲染当前用户云端记录
-        async function renderRecords() {
-            const {data,error} = await supabase.from('notes').select('*').eq('username',currentUser).order('create_at',{ascending:false});
-            if(error){
-                alert(error.message);
-                return;
-            }
-            if (data.length === 0) {
-                recordList.innerHTML = '<div class="empty-tip">还没有记录，发送第一条内容吧</div>';
-                return;
-            }
-            recordList.innerHTML = '';
-            data.forEach(record => {
-                const item = document.createElement('div');
-                item.className = 'record-item';
-                item.innerHTML = `
-                    <div><strong>${record.type_name}</strong></div>
-                    <div>${record.content}</div>
-                    <div style="font-size: 12px; color: #999; margin-top: 8px;">${new Date(record.create_at).toLocaleString('zh-CN')}</div>
-                `;
-                recordList.appendChild(item);
-            });
+    // 登录
+    loginBtn.onclick = async function(){
+        const name = usernameInput.value.trim();
+        if(!name){
+            alert("请输入名字");
+            return;
         }
+        currentUser = name;
+        loginPanel.style.display="none";
+        selectPanel.style.display="grid";
+    }
 
-        // 点击分类按钮
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.onclick = function () {
-                currentType = this.dataset.type;
-                titleText.innerText = typeConfig[currentType].name;
-                sendBtn.innerText = typeConfig[currentType].btnText;
-                selectPanel.style.display = 'none';
-                inputPanel.style.display = 'block';
-                contentInput.value = '';
-                recordBox.style.display="none";
-            };
+    // 渲染当前用户云端记录
+    async function renderRecords() {
+        const {data,error} = await supabase.from('notes').select('*').eq('username',currentUser).order('create_at',{ascending:false});
+        if(error){
+            alert(error.message);
+            return;
+        }
+        if (data.length === 0) {
+            recordList.innerHTML = '<div class="empty-tip">还没有记录，发送第一条内容吧</div>';
+            return;
+        }
+        recordList.innerHTML = '';
+        data.forEach(record => {
+            const item = document.createElement('div');
+            item.className = 'record-item';
+            item.innerHTML = `
+                <div><strong>${record.type_name}</strong></div>
+                <div>${record.content}</div>
+                <div style="font-size: 12px; color: #999; margin-top: 8px;">${new Date(record.create_at).toLocaleString('zh-CN')}</div>
+            `;
+            recordList.appendChild(item);
         });
+    }
 
-        // 返回选择页
-        backBtn.onclick = function () {
-            inputPanel.style.display = 'none';
-            selectPanel.style.display = 'grid';
-        };
-
-        // 查看/隐藏记录 切换按钮
-        recordToggleBtn.onclick = async function(){
-            if(recordBox.style.display === "none"){
-                await renderRecords();
-                recordBox.style.display = "block";
-                this.innerText = "关闭记录";
-            }else{
-                recordBox.style.display = "none";
-                this.innerText = "我的记录";
-            }
-        }
-
-        // 发送，写入云端数据库
-        sendBtn.onclick = async function () {
-            const text = contentInput.value.trim();
-            if (!text) {
-                alert('请输入内容哦');
-                return;
-            }
-            const {error} = await supabase.from('notes').insert([{
-                username:currentUser,
-                type_name:typeConfig[currentType].name,
-                content:text
-            }]);
-            if(error){
-                alert("提交失败："+error.message);
-                return;
-            }
-            alert('✅发送成功！');
+    // 点击分类按钮
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.onclick = function () {
+            currentType = this.dataset.type;
+            titleText.innerText = typeConfig[currentType].name;
+            sendBtn.innerText = typeConfig[currentType].btnText;
+            selectPanel.style.display = 'none';
+            inputPanel.style.display = 'block';
             contentInput.value = '';
+            recordBox.style.display="none";
         };
-    </script>
+    });
+
+    // 返回选择页
+    backBtn.onclick = function () {
+        inputPanel.style.display = 'none';
+        selectPanel.style.display = 'grid';
+    };
+
+    // 查看/隐藏记录 切换按钮
+    recordToggleBtn.onclick = async function(){
+        if(recordBox.style.display === "none"){
+            await renderRecords();
+            recordBox.style.display = "block";
+            this.innerText = "关闭记录";
+        }else{
+            recordBox.style.display = "none";
+            this.innerText = "我的记录";
+        }
+    }
+
+    // 发送，写入云端数据库
+    sendBtn.onclick = async function () {
+        const text = contentInput.value.trim();
+        if (!text) {
+            alert('请输入内容哦');
+            return;
+        }
+        const {error} = await supabase.from('notes').insert([{
+            username:currentUser,
+            type_name:typeConfig[currentType].name,
+            content:text
+        }]);
+        if(error){
+            alert("提交失败："+error.message);
+            return;
+        }
+        alert('✅发送成功！');
+        contentInput.value = '';
+    };
+})
+</script>
 </body>
 </html>
