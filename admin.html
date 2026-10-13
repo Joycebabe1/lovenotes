@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台管理 | For my love Jett</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
+body{background:#d7f0dd;padding:24px}
+.container{max-width:700px;margin:0 auto;background:#fff;padding:24px;border-radius:20px}
+h1{color:#4a7c59;margin-bottom:20px;text-align:center}
+.item{background:#f4fcf6;padding:16px;border-radius:12px;margin-bottom:12px}
+.name{font-weight:bold;color:#4a7c59;margin-bottom:4px}
+.time{font-size:12px;color:#777;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>全部留言记录</h1>
+<div id="list"></div>
+</div>
+<script>
+const SUPABASE_URL = "https://jhwvrkybppblaxipzatzt.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impod3Zya3licGJsYXhpcHphdHp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4OTA4MzEsImV4cCI6MjEwNzQ2NjgzMX0.q0uYDzEFDKnm30LsG2fdnSF_npcMkpYaPGGUZm-GHS4";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+(async function loadAll(){
+    const {data,error}=await supabase.from("notes").select("*").order("create_at",{ascending:false});
+    if(error){
+        document.getElementById("list").innerText="读取失败："+error.message;
+        return;
+    }
+    const wrap = document.getElementById("list");
+    data.forEach(row=>{
+        const div=document.createElement("div");
+        div.className="item";
+        div.innerHTML=`
+            <div class="name">用户：${row.username} | ${row.type_name}</div>
+            <div>${row.content}</div>
+            <div class="time">${new Date(row.create_at).toLocaleString('zh-CN')}</div>
+        `;
+        wrap.appendChild(div);
+    })
+})()
+</script>
+</body>
+</html>
